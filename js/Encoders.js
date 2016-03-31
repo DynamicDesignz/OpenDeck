@@ -10,7 +10,7 @@ function sendEncoderGet() {
  sendMessage([0xf0, 0x00, 0x53, 0x43, 0x00, 0x01, 0x02, 0x02, 0xf7]); //enocoding modes
  setTimeout(function () {
   fillAllEncoders();
- }, 500);
+ }, fillDelay);
 
 }
 

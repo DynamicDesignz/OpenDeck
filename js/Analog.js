@@ -19,7 +19,7 @@ function sendAnalogGet() {
  
  setTimeout(function () {
   fillAllAnalog();
- }, 500);
+ }, fillDelay);
 
 }
 

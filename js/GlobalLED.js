@@ -14,7 +14,7 @@ function sendGlobalLEDGet() {
 
  setTimeout(function () {
   editGlobalLedData();
- }, 500);
+ }, fillDelay);
  var i = 0;
 }
 

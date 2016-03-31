@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
  <title>OpenDeck</title>
  
@@ -9,24 +9,26 @@
 
  <script src="js/jquery-1.12.0.min.js"></script>
  
- <script src="js/Main.js"></script>
+ <!--<script src="js/Main.js"></script>
  <script src="js/ConnectToMIDIDevice.js"></script>
  <script src="js/Buttons.js"></script>
  <script src="js/Encoders.js"></script>
  <script src="js/LEDs.js"></script>
  <script src="js/Analog.js"></script>
  <script src="js/MIDI.js"></script>
- <script src="js/GlobalLED.js"></script>
+ <script src="js/GlobalLED.js"></script>-->
+
+ <script src="js/ConnectToMIDIDevice.js"></script>
 
  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 </head>
-<body onload="checkForDevices();">
- 
+
+<body >
+ <!--Init screen-->
  <div id="loader">
-  
   <div id="ripple" class="centered">
-   <div id="ripple-content" class="ripple-content" >Scanning for device</div>
+   <div id="loader-content" class="ripple-content" >Searching for device</div>
    <div class="ripple-animation">
     <div class="circle"></div>
     <div class="circle"></div>
@@ -37,128 +39,163 @@
   </div>
  </div>
 
- 
- <div id="main" class="flip-container" style="display:none;">
-  <div class="flipper">
-   <div class="front">
-    <div id="contentWrap" class="tranisitionItem">
-     <img src="img/mobile_menu_icon.png" width="50" onclick="flip();" />
-     <div id="content" class="content"></div>
-     <div id="edit" style="display:none;" class="content">
-     </div>
-    </div>
-   </div>
-   <div class="back">
-    <ul id="menu" class="menu">
-     <li class="menuItem" onclick="flip();"><img class="logo" width="300" src="img/logo.jpg" /></li>
-     <li class="menuItem">
-      <span>Configuration</span>
-      <ul class="menuSubLevel">
-       <li onclick="sendMIDIGet();  flip();">MIDI</li>
-       <li onclick="sendButtonGet(); showContent(); setContentMargin(); flip();">Buttons</li>
-       <li onclick="sendEncoderGet(); showContent(); setContentMargin(); flip(); ">Encoders</li>
-       <li onclick="sendLedGet(); showContent(); setContentMargin(); flip(); ">LEDs</li>
-       <li onclick="sendGlobalLEDGet(); showContent(); flip(); ">Global LEDs</li>
-       <li onclick="sendAnalogGet(); showContent(); setContentMargin(); flip(); ">Analog</li>
-      </ul>
-     </li>
-     <li class="menuItem">
-      <span>Settings</span>
-      <ul class="menuSubLevel">
-       <li>link 1 </li>
-       <li>link 2 </li>
-       <li>link 3 </li>
-      </ul>
-     </li>
-    </ul>
-   </div>
+
+
+ <!--Content-->
+ <div id="main" class="main" style="display:none;">
+  
+  <div class="top">
+   <a href="javascript:void(0);" class="menuIcon" onclick="menu();">
+    <span></span>
+    <span></span>
+    <span></span>
+   </a>
+   <div class="title">Welcome</div>
   </div>
+
+  <div id="content" class="content"><div class="welcomeMessage">Click on the menu icon and select action</div></div>
+  <div id="edit" style="display:none;" class="content"></div>
+
+ </div>
+ 
+ 
+ <!--Menu-->
+ <div id="menu" >
+  <ul  class="menu">
+   <li class="menuItemClose" onclick="menu();">
+     <ul class="buns">
+       <li class="bun"></li>
+       <li class="bun"></li>
+     </ul>
+   </li>
+   <li id="btn_midi" class="menuItem" >MIDI</li>
+   <li id="btn_btns" class="menuItem" >Buttons</li>
+   <li id="btn_enco" class="menuItem" >Encoders</li>
+   <li id="btn_leds" class="menuItem" >LEDs</li>
+   <li id="btn_gled" class="menuItem" >Global LEDs</li>
+   <li id="btn_anal" class="menuItem" >Analog</li>
+    
+  </ul>
  </div>
 
  <script>
 
   $(document).ready(function () {
-   $('#menu span').each(function () {
-    $(this).unbind().bind('click', openOne);
-   });
-   $('.menuSubLevel li').each(function () {
-    $(this).unbind().bind('click', setOne);
-   });
-
-   window.onresize = onResize;
-
+   var _midiGod = new MidiGod();
+   _midiGod.hearOurCall();
+   window.onresize = _midiGod.onResize;
   });
 
-  function onResize(event) {
-   setContentMargin();
-  }
-
-  function setContentMargin() {
-   setTimeout(function () {
-    var maxWidth = $('#content').width()-1;
-    var elWidth = 200;
-    var maxElements = Math.floor(maxWidth / elWidth);
-    
-
-    var margin = mesaureMargin(maxElements, maxWidth, elWidth);
-    if (margin < 20) {
-     margin = mesaureMargin(maxElements - 1, maxWidth, elWidth);
-    }
-    
-    
-
-    $('#content a').each(function () {
-     $(this).css('margin', '10px ' + margin + 'px');
-    });
-   },500);
-  }
-
-
-  function mesaureMargin(maxElements, maxWidth, elWidth)
-  {
-   var w = maxElements * elWidth;
-   var margin = ((maxWidth - w) / maxElements) / 2;
-   return margin;
-  }
-
-  function openOne(_event) {
-   var skip = true;
-   var timeout = false;
-   if ($(_event.currentTarget).parent().hasClass('menuHover')) {
-    skip = false;
-   }
-   $('.menuItem').each(function () {
-    if ($(this).hasClass('menuHover')) timeout = true;
-   });
-
-   closeAll();
-   
-   if (skip) {
-    if (timeout)
-     setTimeout(function () { openOneItem(_event); }, 1000);
-    else
-     openOneItem(_event);
-    }
-   
-  }
-
-  function openOneItem(_event) {
-   $(_event.currentTarget).parent().toggleClass('menuHover');
-   $(_event.currentTarget).addClass('menuItemActive');
-  }
  
 
-  function closeAll() {
-   $('#menu .menuItem').removeClass('menuHover');
-   $('#menu span').removeClass('menuItemActive');
-  }
-
-  function setOne(_event) {
-   $('.menuSubLevel li').removeClass('menuItemActive');
-   $(_event.currentTarget).addClass('menuItemActive');
+  function menu() {
+   $('#menu').toggleClass('show');
   }
 
  </script>
+ <style>
+
+  .welcomeMessage {
+       text-align: center;
+    font-size: 30px;
+    margin-top: 20%;
+    color: #0090c5;
+  }
+
+  .menuIcon span{
+      width: 30px;
+    height: 3px;
+    background: #FFF;
+    display: block;
+    margin: 6px;
+  }
+
+  .title {
+    
+      text-align: center;
+    color: #FFF;
+    font-size: 30px;
+        margin-top: 4px;
+  }
+
+  .menuIcon:hover span {
+       background: #f1f2f4;
+  }
+
+  .menuIcon {
+  padding: 5px 0 0 5px;
+      display: inline-block;
+      position: absolute;
+  }
+
+  .top {
+  }
+  ul.buns li.bun {
+       -webkit-transform: rotate(45deg) translateZ(0);
+    transform: rotate(45deg) translateZ(0);
+  }
+  ul.buns li.bun:last-child {
+    -webkit-transform: rotate(-45deg) translateZ(0);
+    transform: rotate(-45deg) translateZ(0);
+  }
+
+  ul.buns li.bun {
+   width: 20px;
+   height: 2px;
+   background-color: #fff;
+   position: absolute;
+   
+  }
+
+  .top {
+  position:fixed;
+  width:100%;
+  height:40px;
+  z-index:15;
+  background: #0090c5;
+  }
+  #menu {
+    height: 100%;
+    width: 100%;
+    background: #0090c5;
+    left: -320px;
+    position: absolute;
+    top: 0;
+    max-width: 320px;
+    transition:1s;
+    z-index:15;
+  }
+
+  .show
+{
+    left:0 !important;
+    transition:1s;
+}
+
+  @-webkit-keyframes fadeInFromNone {
+   0% {
+    left: -320px;
+   }
+
+
+   100% {
+    left: 0 !important;
+   }
+  }
+
+  @-moz-keyframes fadeInFromNone {
+   0% {
+    left: -320px;
+   }
+
+
+   100% {
+    left: 0 !important;
+   }
+  }
+
+ </style>
+
 
 </body>
 </html>

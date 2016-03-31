@@ -16,7 +16,7 @@ function sendMIDIGet() {
  
  setTimeout(function () {
   editMIDIData();
- }, 500);
+ }, fillDelay);
  
 }
 
@@ -75,9 +75,7 @@ function sendMessageSaveMIDI() {
  var _ccChannel = getValueRange('cc-channel');
  var _inputChannel = getValueRange('input-channel');
  
- sendMessage([0xf0, 0x00, 0x53, 0x43, 0x01, 0x01, 0x00, 0x00, _standardNote, _runningStatus, _usbConvert , 0xf7]); //Features
-
- sendMessage([0xf0, 0x00, 0x53, 0x43, 0x01, 0x01, 0x00, 0x01, _noteChannel, _programChangeChannel, _ccChannel, _inputChannel, 0xf7]); //Channels
+ 
  
 
 }

@@ -9,7 +9,7 @@ function sendLedGet() {
  sendMessage([0xf0, 0x00, 0x53, 0x43, 0x00, 0x01, 0x04, 0x03, 0xf7]); //RGB led enabled state
  setTimeout(function () {
   fillAllLed();
- }, 500);
+ }, fillDelay);
 
 }
 
